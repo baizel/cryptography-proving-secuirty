@@ -11,8 +11,6 @@ import java.util.Random;
  */
 
 public class PaillierScheme {
-    private static final int NUMBER_BIT_LENGTH = 1024;
-
     /**
      * The key generation algorithm.
      *
@@ -22,9 +20,14 @@ public class PaillierScheme {
     public static KeyPair Gen(int n) {
         BigInteger p = BigInteger.probablePrime(n, new SecureRandom());
         BigInteger q = BigInteger.probablePrime(n, new SecureRandom());
+        System.out.println(p +" "+ q);
         BigInteger N = p.multiply(q);
-        BigInteger phiN = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
-        return new KeyPair(new PublicKey(N, N.multiply(N)), new PrivateKey(N, N.multiply(N), phiN));
+        BigInteger NSqr = N.pow(2);
+//        // Expand (p-1)(q-1) -> N - p - q + 1. Note: N -> p*q
+//        BigInteger phiN = N.subtract(p).subtract(q).add(BigInteger.ONE);
+        BigInteger phiN = (p.subtract(BigInteger.ONE)).multiply((q.subtract(BigInteger.ONE)));
+
+        return new KeyPair(new PublicKey(N, NSqr), new PrivateKey(N, NSqr, phiN));
     }
 
     /**
@@ -36,10 +39,20 @@ public class PaillierScheme {
      */
 
     public static BigInteger Enc(PublicKey pk, BigInteger m) {
-        BigInteger nm = pk.getN().add(BigInteger.ONE);
-        Random r = new SecureRandom();
-        BigInteger uniformRandom = new BigInteger(NUMBER_BIT_LENGTH, new SecureRandom());
+        BigInteger N = pk.getN();
+        BigInteger NSqr = pk.getNSqr();
 
+        BigInteger r = BigInteger.probablePrime(
+                // -1 so that random number will always be less than N
+                N.bitLength() - 1,
+                new SecureRandom()
+        );
+        // (1 + N)^m mod N^2
+        BigInteger a = (N.add(BigInteger.ONE)).modPow(m, NSqr);
+        // r^m mod N^2
+        BigInteger b = r.modPow(N, NSqr);
+
+        return a.multiply(b);
     }
 
     /**
@@ -50,7 +63,15 @@ public class PaillierScheme {
      * @return the plaintext decrypted from c
      */
     public static BigInteger Dec(PrivateKey sk, BigInteger c) {
+        BigInteger N = sk.getN();
+        BigInteger NSqr = sk.getNSqr();
+        BigInteger phiN = sk.getPhiN();
 
+        BigInteger a = c.modPow(phiN, NSqr);
+        BigInteger b = (a.subtract(BigInteger.ONE)).divide(N);
+        BigInteger ma = b.modPow(BigInteger.ONE, N);
+        BigInteger mb = phiN.modInverse(N);
+        return ma.multiply(mb);
     }
 
     /**
@@ -62,6 +83,7 @@ public class PaillierScheme {
      * @return the ciphertext contains the addition result
      */
     public static BigInteger Add(PublicKey pk, BigInteger c1, BigInteger c2) {
+        return null;
 
     }
 
@@ -75,6 +97,7 @@ public class PaillierScheme {
      */
 
     public static BigInteger Multiply(PublicKey pk, BigInteger s, BigInteger c) {
+        return null;
 
     }
 
