@@ -8,7 +8,7 @@ public class Test {
         KeyPair kp = PaillierScheme.Gen(16);
         //System.out.println(kp.getPrivateKey().getN().toString());
         BigInteger cipher = (
-                PaillierScheme.Enc(kp.getPublicKey(), new BigInteger("256"))
+                PaillierScheme.Enc(kp.getPublicKey(), new BigInteger("45"))
         );
         System.out.println(PaillierScheme.Dec(kp.getPrivateKey(), cipher));
     }

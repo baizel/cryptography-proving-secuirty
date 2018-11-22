@@ -41,6 +41,9 @@ public class PaillierScheme {
      */
 
     public static BigInteger Enc(PublicKey pk, BigInteger m) {
+        if (!m.gcd(pk.getN()).equals(BigInteger.ONE) || m.compareTo(pk.getN()) >= 0 ){
+            throw new IllegalArgumentException("M must be in the set Z*N");
+        }
         BigInteger N = pk.getN();
         BigInteger NSqr = pk.getNSqr();
 
@@ -50,12 +53,12 @@ public class PaillierScheme {
                 new SecureRandom()
         );
 
-        // (1 + N)^m mod N^2
+        // (1 + N)^m
         BigInteger a = (N.add(BigInteger.ONE)).modPow(m, NSqr);
-        // r^m mod N^2
+        // r^N mod N^2
         BigInteger b = r.modPow(N, NSqr);
 
-        return a.multiply(b);
+        return a.multiply(b).mod(NSqr);
     }
 
     /**
@@ -72,9 +75,9 @@ public class PaillierScheme {
 
         BigInteger a = c.modPow(phiN, NSqr);
         BigInteger b = (a.subtract(BigInteger.ONE)).divide(N);
-        BigInteger ma = b.modPow(BigInteger.ONE, N);
+        BigInteger ma = b.mod(N);
         BigInteger mb = phiN.modInverse(N);
-        return ma.multiply(mb);
+        return ma.multiply(mb).mod(N);
     }
 
     /**
@@ -86,7 +89,7 @@ public class PaillierScheme {
      * @return the ciphertext contains the addition result
      */
     public static BigInteger Add(PublicKey pk, BigInteger c1, BigInteger c2) {
-        return c1.multiply(c2).modPow(BigInteger.ONE,pk.getNSqr());
+        return c1.multiply(c2).mod(pk.getNSqr());
     }
 
     /**
