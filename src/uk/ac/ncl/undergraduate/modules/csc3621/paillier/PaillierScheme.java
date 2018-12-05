@@ -54,18 +54,20 @@ public class PaillierScheme {
 
     /**
      * Function to get r which is in group Z*N
+     *
      * @param length bit length of r
      * @param N
      * @return Bigintger R as in the group Z*N
      */
-    public static BigInteger getRandomR(int length, BigInteger N){
-        BigInteger r =new BigInteger(length, new SecureRandom());
-        while (!N.gcd(r).equals(BigInteger.ONE)){
+    public static BigInteger getRandomR(int length, BigInteger N) {
+        BigInteger r = new BigInteger(length, new SecureRandom());
+        while (!N.gcd(r).equals(BigInteger.ONE)) {
             r = r.add(BigInteger.ONE);
         }
 
         return r;
     }
+
     /**
      * The decryption algorithm
      *
