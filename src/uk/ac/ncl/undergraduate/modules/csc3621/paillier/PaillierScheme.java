@@ -44,7 +44,7 @@ public class PaillierScheme {
         BigInteger NSqr = pk.getNSqr();
         BigInteger r = getRandomR(N.bitLength() - 1, N);
 
-        // (1 + N)^m
+        // (1 + N)^m . r^N m^2
         BigInteger a = (N.add(BigInteger.ONE)).modPow(m, NSqr);
         // r^N mod N^2
         BigInteger b = r.modPow(N, NSqr);
@@ -64,7 +64,6 @@ public class PaillierScheme {
         while (!N.gcd(r).equals(BigInteger.ONE)) {
             r = r.add(BigInteger.ONE);
         }
-
         return r;
     }
 
@@ -76,7 +75,7 @@ public class PaillierScheme {
      * @return the plaintext decrypted from c
      */
     public static BigInteger Dec(PrivateKey sk, BigInteger c) {
-        //  Return statement is below code just in one line to be faster
+        //  Return statement is below code just in one line to be slightly faster
         //  a = c.modPow(phiN, NSqr);
         //  b = (a.subtract(BigInteger.ONE)).divide(N);
         //  ma = b.mod(N);
