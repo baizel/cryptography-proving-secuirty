@@ -1,4 +1,4 @@
-# Cryptography - Proving Secuirty 
+# Cryptography - Proving Security 
 The aim of the first part of the coursework was to implement a given cipher using java libraries that was then tested for performance and accuracy. The finished implementation can be seen in the Java file.
 
 The second part of the coursework was to proove that given some cypher scheme they are not secure. The proof can be seen below. 
